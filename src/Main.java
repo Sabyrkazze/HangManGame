@@ -1,4 +1,5 @@
 import java.util.ArrayList;
+import java.util.InputMismatchException;
 import java.util.Scanner;
 
 public class Main {
@@ -8,48 +9,36 @@ public class Main {
 
         while(true){
             int answer;
-            String word = words.chooseAWord();
+            String word = words.chooseAWord().toUpperCase();
             try {
-                System.out.println("Ойынды бастау - 1");
-                System.out.println("Шығу - 0");
-                answer = scanner.nextInt();
-                scanner.nextLine();
-
-            } catch (Exception e) { // InputMismatchException
+                answer = startOrExit(scanner);
+            } catch (InputMismatchException e) { // InputMismatchException
                 System.out.println("Тек 0 немесе 1 сандарын енгізіңіз!");
                 scanner.nextLine();
                 continue;
             }
 
-
             if(answer == 1){
+                StringBuilder wrongLetters = new StringBuilder();
+                ArrayList<Character> hiddenWord = fillWithUnderscore(word);
+
+                System.out.println("Ойынды бастайық! ");
+                System.out.println();
+
                 int loseCount = 0;
                 int winCount = 0;
                 int lineToRead = 0;
 
-                StringBuilder wrongLetters = new StringBuilder();
-                ArrayList<Character> hiddenWord = new ArrayList<>();
-                for (int i = 0; i < word.length(); i++) {
-                    hiddenWord.add('_');
-                }
-                System.out.println("Ойынды бастайық! ");
-                System.out.println();
-
                 while(loseCount < 6){
                     if(winCount == word.length()){
-                        System.out.println("  ЖЕҢІС !");
-                        System.out.println();
-                        System.out.println("Жасырылған сөз: " + word.toUpperCase());
-                        System.out.println();
+                        congratulateUser(word);
                         break;
                     }
-                    System.out.print("Жасырылған сөз: ");
-                    System.out.println(hiddenWord);
-                    System.out.println("Қате әріптер: " + wrongLetters );
+                    showHiddenWordAndWrongLetters(hiddenWord, wrongLetters);
                     getGallowState(lineToRead);
 
                     System.out.println("Әріпті енгізіңіз: ");
-                    String input = scanner.next();
+                    String input = scanner.next().toUpperCase();
                     if (input.length() == 1){
                         char guessingLetter = input.charAt(0);
 
@@ -92,6 +81,36 @@ public class Main {
                 System.out.println("Тек 0 немесе 1 сандарын енгізіңіз!");
             }
         }
+    }
+
+    private static void showHiddenWordAndWrongLetters(ArrayList<Character> hiddenWord, StringBuilder wrongLetters) {
+        System.out.print("Жасырылған сөз: ");
+        System.out.println(hiddenWord);
+        System.out.println("Қате әріптер: " + wrongLetters);
+    }
+
+    private static int startOrExit(Scanner scanner) {
+        int answer;
+        System.out.println("Ойынды бастау - 1");
+        System.out.println("Шығу - 0");
+        answer = scanner.nextInt();
+        scanner.nextLine();
+        return answer;
+    }
+
+    private static ArrayList<Character> fillWithUnderscore(String word) {
+        ArrayList<Character> hiddenWord = new ArrayList<>();
+        for (int i = 0; i < word.length(); i++) {
+            hiddenWord.add('_');
+        }
+        return hiddenWord;
+    }
+
+    private static void congratulateUser(String word) {
+        System.out.println("  ЖЕҢІС !");
+        System.out.println();
+        System.out.println("Жасырылған сөз: " + word.toUpperCase());
+        System.out.println();
     }
 
     private static int putGuessedLettersToList(String word, char guessingLetter, ArrayList<Character> hiddenWord, int winCount) {
