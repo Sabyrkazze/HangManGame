@@ -8,12 +8,11 @@ public class Words {
 
     public String chooseAWord(){
         int randomNumber = random.nextInt(58);
-//        try {
-//            String word = Files.readAllLines(Paths.get("resources/words.txt")).get(randomNumber);
-//            return word;
-//        } catch (IOException e) {
-//            throw new RuntimeException(e);
-//        }
-        return "МЫСЫҚ";
+        try {
+            String word = Files.readAllLines(Paths.get("resources/words.txt")).get(randomNumber);
+            return word;
+        } catch (IOException e) {
+            throw new RuntimeException(e);
+        }
     }
 }

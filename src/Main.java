@@ -146,5 +146,4 @@ public class Main {
             System.out.println(hangingMan.getGallowStateLine(i));
         }
     }
-
 }
