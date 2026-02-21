@@ -63,11 +63,7 @@ public class Main {
                                 }
                             }else {
                                 if(!hiddenWord.contains(guessingLetter)){
-                                    ArrayList<Integer> indexes = letterIndexesInWord(word, guessingLetter);
-                                    for (int i = 0; i < indexes.size(); i++) {
-                                        hiddenWord.set(indexes.get(i), guessingLetter);
-                                        winCount++;
-                                    }
+                                    winCount = putGuessedLettersToList(word, guessingLetter, hiddenWord, winCount);
                                     getGallowState(lineToRead);
                                 }else{
                                     getGallowState(lineToRead);
@@ -87,12 +83,7 @@ public class Main {
                 }
                 if (winCount != word.length()){
                     getGallowState(lineToRead);
-
-                    System.out.println("  Таба алмадыңыз:( \n" +
-                            "  Ойын аяқталды.");
-                    System.out.println();
-                    System.out.println("Жасырылған сөз: " + word.toUpperCase());
-                    System.out.println();
+                    notifyDefeat(word);
                 }
             } else if (answer == 0) {
                 System.out.println("Сау болыңыз!");
@@ -101,6 +92,23 @@ public class Main {
                 System.out.println("Тек 0 немесе 1 сандарын енгізіңіз!");
             }
         }
+    }
+
+    private static int putGuessedLettersToList(String word, char guessingLetter, ArrayList<Character> hiddenWord, int winCount) {
+        ArrayList<Integer> indexes = letterIndexesInWord(word, guessingLetter);
+        for (int i = 0; i < indexes.size(); i++) {
+            hiddenWord.set(indexes.get(i), guessingLetter);
+            winCount++;
+        }
+        return winCount;
+    }
+
+    private static void notifyDefeat(String word) {
+        System.out.println("  Таба алмадыңыз:( \n" +
+                "  Ойын аяқталды.");
+        System.out.println();
+        System.out.println("Жасырылған сөз: " + word.toUpperCase());
+        System.out.println();
     }
 
     public static ArrayList<Integer> letterIndexesInWord(String word, char letterToFind){
