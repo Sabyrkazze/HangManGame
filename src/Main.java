@@ -12,7 +12,7 @@ public class Main {
             String word = words.chooseAWord().toUpperCase();
             try {
                 answer = startOrExit(scanner);
-            } catch (InputMismatchException e) { // InputMismatchException
+            } catch (InputMismatchException e) {
                 System.out.println("Тек 0 немесе 1 сандарын енгізіңіз!");
                 scanner.nextLine();
                 continue;
@@ -39,36 +39,37 @@ public class Main {
 
                     System.out.println("Әріпті енгізіңіз: ");
                     String input = scanner.next().toUpperCase();
-                    if (input.length() == 1){
-                        char guessingLetter = input.charAt(0);
 
-                        if (!Character.isDigit(guessingLetter)){
-                            if (!word.contains(String.valueOf(guessingLetter))){
-                                getGallowState(lineToRead);
-                                lineToRead += 7;
-                                loseCount++;
-                                if (!String.valueOf(wrongLetters).contains(String.valueOf(guessingLetter))){
-                                    wrongLetters.append(guessingLetter).append(" ");
-                                }
-                            }else {
-                                if(!hiddenWord.contains(guessingLetter)){
-                                    winCount = putGuessedLettersToList(word, guessingLetter, hiddenWord, winCount);
-                                    getGallowState(lineToRead);
-                                }else{
-                                    getGallowState(lineToRead);
-                                    lineToRead += 7;
-                                    loseCount++;
-                                }
-                            }
-                        }else {
-                            System.out.println("Өтінемін, әріп енгізіңіз.");
-                            System.out.println();
-                        }
-                    }else{
+                    if(input.length() > 1){
                         System.out.println("Сіз тым ұзын жол енгіздіңіз. Тек бір әріп енгізіңіз.");
                         System.out.println();
+                        continue;
                     }
 
+                    char guessingLetter = input.charAt(0);
+
+                    if(Character.isDigit(guessingLetter)){
+                        System.out.println("Өтінемін, әріп енгізіңіз.");
+                        System.out.println();
+                        continue;
+                    }
+                    if (!word.contains(String.valueOf(guessingLetter))){
+                        getGallowState(lineToRead);
+                        lineToRead += 7;
+                        loseCount++;
+                        if (!String.valueOf(wrongLetters).contains(String.valueOf(guessingLetter))){
+                            wrongLetters.append(guessingLetter).append(" ");
+                        }
+                    }else {
+                        if(!hiddenWord.contains(guessingLetter)){
+                            winCount = putGuessedLettersToList(word, guessingLetter, hiddenWord, winCount);
+                            getGallowState(lineToRead);
+                        }else{
+                            getGallowState(lineToRead);
+                            lineToRead += 7;
+                            loseCount++;
+                        }
+                    }
                 }
                 if (winCount != word.length()){
                     getGallowState(lineToRead);
