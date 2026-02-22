@@ -9,7 +9,6 @@ public class Main {
 
         while(true){
             int answer;
-            String word = words.chooseAWord().toUpperCase();
             try {
                 answer = startOrExit(scanner);
             } catch (InputMismatchException e) {
@@ -17,63 +16,68 @@ public class Main {
                 scanner.nextLine();
                 continue;
             }
-
             if(answer == 1){
-                StringBuilder wrongLetters = new StringBuilder();
-                ArrayList<Character> hiddenWord = fillWithUnderscore(word);
-
                 System.out.println("Ойынды бастайық! ");
                 System.out.println();
-
-                int loseCount = 0;
-                int winCount = 0;
-                int lineToRead = 0;
-
-                while(loseCount < 6){
-                    if(winCount == word.length()){
-                        congratulateUser(word);
-                        break;
+                while(true){
+                    int difficulty;
+                    try {
+                        difficulty = chooseDifficulty(scanner);
+                    } catch (InputMismatchException e) {
+                        System.out.println("1,2 немесе 3 сандарын ғана енгізіңіз.");
+                        scanner.nextLine();
+                        continue;
                     }
-                    showHiddenWordAndWrongLetters(hiddenWord, wrongLetters);
-                    getGallowState(lineToRead);
-
-                    System.out.println("Әріпті енгізіңіз: ");
-                    String input = scanner.next().toUpperCase();
-
-                    if(input.length() > 1){
-                        System.out.println("Сіз тым ұзын жол енгіздіңіз. Тек бір әріп енгізіңіз.");
-                        System.out.println();
+                    if(difficulty != 1 && difficulty != 2 && difficulty != 3){
+                        System.out.println("Тек 1, 2, 3 сандары берілуі керек!");
                         continue;
                     }
 
-                    char guessingLetter = input.charAt(0);
+                        String word = words.chooseAWord(getPathForDifficulty(difficulty)).toUpperCase();
 
-                    if(Character.isDigit(guessingLetter)){
-                        System.out.println("Өтінемін, әріп енгізіңіз.");
-                        System.out.println();
-                        continue;
-                    }
-                    if (!word.contains(String.valueOf(guessingLetter))){
-                        getGallowState(lineToRead);
-                        lineToRead += 7;
-                        loseCount++;
-                        if (!String.valueOf(wrongLetters).contains(String.valueOf(guessingLetter))){
-                            wrongLetters.append(guessingLetter).append(" ");
+                    StringBuilder wrongLetters = new StringBuilder();
+                    ArrayList<Character> hiddenWord = fillWithUnderscore(word);
+
+                    int loseCount = 0;
+                    int winCount = 0;
+                    int lineToRead = 0;
+
+                    while (loseCount < 6) {
+                        if (winCount == word.length()) {
+                            congratulateUser(word);
+                            break;
                         }
-                    }else {
-                        if(!hiddenWord.contains(guessingLetter)){
-                            winCount = putGuessedLettersToList(word, guessingLetter, hiddenWord, winCount);
-                            getGallowState(lineToRead);
-                        }else{
+                        showHiddenWordAndWrongLetters(hiddenWord, wrongLetters);
+                        getGallowState(lineToRead);
+
+                        System.out.println("Әріпті енгізіңіз: ");
+                        String input = scanner.next().toUpperCase();
+                        char guessingLetter = input.charAt(0);
+
+                        if (!hasValidLength(input)) continue;
+                        if (!isValidLetter(guessingLetter)) continue;
+                        if (!word.contains(String.valueOf(guessingLetter))) {
                             getGallowState(lineToRead);
                             lineToRead += 7;
                             loseCount++;
+                            if (!String.valueOf(wrongLetters).contains(String.valueOf(guessingLetter))) {
+                                wrongLetters.append(guessingLetter).append(" ");
+                            }
+                        } else {
+                            if (!hiddenWord.contains(guessingLetter)) {
+                                winCount = putGuessedLettersToList(word, guessingLetter, hiddenWord, winCount);
+                                getGallowState(lineToRead);
+                            } else {
+                                getGallowState(lineToRead);
+                                lineToRead += 7;
+                                loseCount++;
+                            }
                         }
                     }
-                }
-                if (winCount != word.length()){
-                    getGallowState(lineToRead);
-                    notifyDefeat(word);
+                    if (winCount != word.length()) {
+                        getGallowState(lineToRead);
+                        notifyDefeat(word);
+                    }
                 }
             } else if (answer == 0) {
                 System.out.println("Сау болыңыз!");
@@ -84,10 +88,54 @@ public class Main {
         }
     }
 
+    private static String getPathForDifficulty(int levelOfDifficulty){
+        if (levelOfDifficulty == 1){
+            return "resources/easy_words.txt";
+        } else if (levelOfDifficulty == 2) {
+            return "resources/medium_words.txt";
+        } else if (levelOfDifficulty == 3) {
+            return "resources/hard_words.txt";
+        }else {
+            System.out.println("Тек 1, 2, 3 сандары берілуі керек!");
+            return null;
+        }
+    }
+
+    private static boolean isValidLetter(char guessingLetter) {
+        if(!Character.isDigit(guessingLetter)){
+            return true;
+        }else{
+            System.out.println("Өтінемін, әріп енгізіңіз.");
+            System.out.println();
+            return false;
+        }
+    }
+
+    private static boolean hasValidLength(String input) {
+        if(input.length() == 1){
+            return true;
+        }else{
+            System.out.println("Сіз тым ұзын жол енгіздіңіз. Тек бір әріп енгізіңіз.");
+            System.out.println();
+            return false;
+        }
+    }
+
     private static void showHiddenWordAndWrongLetters(ArrayList<Character> hiddenWord, StringBuilder wrongLetters) {
         System.out.print("Жасырылған сөз: ");
         System.out.println(hiddenWord);
         System.out.println("Қате әріптер: " + wrongLetters);
+    }
+
+    private static int chooseDifficulty(Scanner scanner){
+        int difficulty;
+        System.out.println("Ойын деңгейін таңдаңыз:");
+        System.out.println("1 - Оңай");
+        System.out.println("2 - Орташа");
+        System.out.println("3 - Қиын");
+        difficulty = scanner.nextInt();
+        scanner.nextLine();
+        return difficulty;
     }
 
     private static int startOrExit(Scanner scanner) {
