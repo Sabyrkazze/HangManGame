@@ -16,75 +16,80 @@ public class Main {
                 scanner.nextLine();
                 continue;
             }
-            if(answer == 1){
-                System.out.println("Ойынды бастайық! ");
-                System.out.println();
-                while(true){
-                    int difficulty;
-                    try {
-                        difficulty = chooseDifficulty(scanner);
-                    } catch (InputMismatchException e) {
-                        System.out.println("1,2 немесе 3 сандарын ғана енгізіңіз.");
-                        scanner.nextLine();
-                        continue;
-                    }
-                    if(difficulty != 1 && difficulty != 2 && difficulty != 3){
+
+            if(answer == 0){
+                System.out.println("Сау болыңыз!");
+                break;
+            }else if (answer != 1){
+                System.out.println("Тек 0 немесе 1 сандарын енгізіңіз!");
+                continue;
+            }
+
+            System.out.println("Ойынды бастайық! ");
+            System.out.println();
+
+            int difficulty;
+            while(true) {
+                try {
+                    difficulty = chooseDifficulty(scanner);
+                    if (difficulty != 1 && difficulty != 2 && difficulty != 3) {
                         System.out.println("Тек 1, 2, 3 сандары берілуі керек!");
                         continue;
                     }
+                    break;
+                } catch (InputMismatchException e) {
+                    System.out.println("1,2 немесе 3 сандарын ғана енгізіңіз.");
+                    scanner.nextLine();
+                }
+            }
 
-                        String word = words.chooseAWord(getPathForDifficulty(difficulty)).toUpperCase();
+            StringBuilder wrongLetters = new StringBuilder();
+            String word = words.chooseAWord(getPathForDifficulty(difficulty)).toUpperCase();
+//            String word = "ЫНТЫМАҚТАСТЫҚ";
+            ArrayList<Character> hiddenWord = fillWithUnderscore(word);
 
-                    StringBuilder wrongLetters = new StringBuilder();
-                    ArrayList<Character> hiddenWord = fillWithUnderscore(word);
+            int loseCount = 0;
+            int winCount = 0;
+            int lineToRead = 0;
 
-                    int loseCount = 0;
-                    int winCount = 0;
-                    int lineToRead = 0;
+            while (loseCount < 6) {
+                if (winCount == word.length()) {
+                    congratulateUser(word);
+                    break;
+                }
+                showHiddenWord(hiddenWord);
+                showWrongLetters(wrongLetters);
+                getGallowState(lineToRead);
 
-                    while (loseCount < 6) {
-                        if (winCount == word.length()) {
-                            congratulateUser(word);
-                            break;
-                        }
-                        showHiddenWordAndWrongLetters(hiddenWord, wrongLetters);
-                        getGallowState(lineToRead);
+                System.out.println("Әріпті енгізіңіз: ");
+                String input = scanner.next().toUpperCase();
+                char guessingLetter = input.charAt(0);
 
-                        System.out.println("Әріпті енгізіңіз: ");
-                        String input = scanner.next().toUpperCase();
-                        char guessingLetter = input.charAt(0);
-
-                        if (!hasValidLength(input)) continue;
-                        if (!isValidLetter(guessingLetter)) continue;
-                        if (!word.contains(String.valueOf(guessingLetter))) {
-                            getGallowState(lineToRead);
-                            lineToRead += 7;
-                            loseCount++;
-                            if (!String.valueOf(wrongLetters).contains(String.valueOf(guessingLetter))) {
-                                wrongLetters.append(guessingLetter).append(" ");
-                            }
-                        } else {
-                            if (!hiddenWord.contains(guessingLetter)) {
-                                winCount = putGuessedLettersToList(word, guessingLetter, hiddenWord, winCount);
-                                getGallowState(lineToRead);
-                            } else {
-                                getGallowState(lineToRead);
-                                lineToRead += 7;
-                                loseCount++;
-                            }
-                        }
+                if (!hasValidLength(input)) continue;
+                if (!isValidLetter(guessingLetter)) continue;
+                if (!word.contains(String.valueOf(guessingLetter))) {
+                    getGallowState(lineToRead);
+                    lineToRead += 7;
+                    loseCount++;
+                    if (!String.valueOf(wrongLetters).contains(String.valueOf(guessingLetter))) {
+                        wrongLetters.append(guessingLetter).append(" ");
                     }
-                    if (winCount != word.length()) {
+                } else {
+                    if (!hiddenWord.contains(guessingLetter)) {
+                        winCount = putGuessedLettersToList(word, guessingLetter, hiddenWord, winCount);
                         getGallowState(lineToRead);
-                        notifyDefeat(word);
+                    } else {
+                        getGallowState(lineToRead);
+                        lineToRead += 7;
+                        loseCount++;
                     }
                 }
-            } else if (answer == 0) {
-                System.out.println("Сау болыңыз!");
-                break;
-            }else {
-                System.out.println("Тек 0 немесе 1 сандарын енгізіңіз!");
             }
+            if (winCount != word.length()) {
+                getGallowState(lineToRead);
+                notifyDefeat(word);
+            }
+
         }
     }
 
@@ -120,10 +125,11 @@ public class Main {
             return false;
         }
     }
-
-    private static void showHiddenWordAndWrongLetters(ArrayList<Character> hiddenWord, StringBuilder wrongLetters) {
+    private static void showHiddenWord(ArrayList<Character> hiddenWord){
         System.out.print("Жасырылған сөз: ");
         System.out.println(hiddenWord);
+    }
+    private static void showWrongLetters(StringBuilder wrongLetters) {
         System.out.println("Қате әріптер: " + wrongLetters);
     }
 
