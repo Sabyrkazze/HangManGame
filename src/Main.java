@@ -3,6 +3,7 @@ import java.util.InputMismatchException;
 import java.util.Scanner;
 
 public class Main {
+
     Scanner scanner = new Scanner(System.in);
     PrintUtils printUtils = new PrintUtils();
     Validation validation = new Validation();
@@ -10,12 +11,18 @@ public class Main {
     TextProcessor textProcessor = new TextProcessor();
     FileReadingUtils fileReading = new FileReadingUtils();
 
+    private static final int QUIT = 0;
+    private static final int PLAY = 1;
+
+
     public static void main(String[] args) {
         Main main = new Main();
         main.start();
     }
 
+
     public void start(){
+
         while(true){
             int answer;
             try {
@@ -27,11 +34,11 @@ public class Main {
                 continue;
             }
 
-            if(answer == 0){
+            if(answer == QUIT){
                 System.out.println("Good Bye!");
                 break;
             }
-            else if (answer != 1){
+            else if (answer != PLAY){
                 printUtils.printNotValidChoice();
                 continue;
             }
