@@ -29,9 +29,4 @@ public class TextProcessor {
         return indexes;
     }
 
-    public void checkAndAppendWrongLetter(StringBuilder wrongLetters, char guessingLetter) {
-        if (!String.valueOf(wrongLetters).contains(String.valueOf(guessingLetter))) {
-            wrongLetters.append(guessingLetter).append(" ");
-        }
-    }
 }

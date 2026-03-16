@@ -1,4 +1,5 @@
 import java.util.ArrayList;
+import java.util.Set;
 
 public class PrintUtils {
 
@@ -26,11 +27,18 @@ public class PrintUtils {
 
     public void printHiddenWord(ArrayList<Character> hiddenWord){
         System.out.print("Hidden word: ");
-        System.out.println(hiddenWord);
+        for (char letter : hiddenWord) {
+            System.out.print(letter + " ") ;
+        }
+        System.out.println();
     }
 
-    public void printWrongLetters(StringBuilder wrongLetters) {
-        System.out.println("Wrong letters: " + wrongLetters);
+    public void printWrongLetters(Set<Character> wrongLetters) {
+        System.out.print("Wrong letters: ");
+        for (char letter : wrongLetters) {
+            System.out.print(letter + " ") ;
+        }
+        System.out.println();
     }
 
     public void printMistakeCounter(int loseCount){
@@ -38,16 +46,19 @@ public class PrintUtils {
     }
 
     public void printWrongAlphabetUsed(){
+        System.out.println();
         System.out.println("LETTERS SHOULD BE ONLY FROM ENGLISH ALPHABET.");
         System.out.println();
     }
 
     public void printLetterWasGuessed(){
+        System.out.println();
         System.out.println("THIS LETTER HAS ALREADY BEEN GUESSED.");
         System.out.println();
     }
 
     public void printLetterWasTried(){
+        System.out.println();
         System.out.println("THIS LETTER HAS ALREADY BEEN TRIED.");
         System.out.println();
     }
@@ -62,7 +73,7 @@ public class PrintUtils {
 
     public void printGameOver(String word) {
         System.out.println("  You couldn't find the word:( \n" +
-                "  GAME OVER.");
+                           "           GAME OVER.");
         System.out.println();
         System.out.println("Hidden word: " + word.toUpperCase());
         System.out.println();

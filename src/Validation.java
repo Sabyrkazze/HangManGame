@@ -19,9 +19,4 @@ public class Validation {
     public boolean isCorrectLetter(String word, char guessingLetter) {
         return word.contains(String.valueOf(guessingLetter));
     }
-
-
-    public boolean stringBuilderHasLetter(StringBuilder wrongLetters, char guessingLetter) {
-        return String.valueOf(wrongLetters).contains(String.valueOf(guessingLetter));
-    }
 }

@@ -1,4 +1,6 @@
+import java.util.Set;
 import java.util.ArrayList;
+import java.util.LinkedHashSet;
 
 public class GameProcess {
 
@@ -43,7 +45,9 @@ public class GameProcess {
     }
 
     private void startRound(){
-        StringBuilder wrongLetters = new StringBuilder();
+
+        Set<Character> wrongLetters = new LinkedHashSet<>();
+//        StringBuilder wrongLetters = new StringBuilder();
         printUtils.printLetsStart();
         printUtils.printDifficultyMenu();
 
@@ -84,12 +88,14 @@ public class GameProcess {
                 continue;
             }
 
-            if (!validation.isCorrectLetter(wordFromFile, guessLetter) && !validation.stringBuilderHasLetter(wrongLetters, guessLetter)) {
+            if (!validation.isCorrectLetter(wordFromFile, guessLetter) && !wrongLetters.contains(guessLetter)) {
                 gallowsLineToRead += GALLOW_SIZE_IN_FILE;
                 mistakeCount++;
-                textProcessor.checkAndAppendWrongLetter(wrongLetters, guessLetter);
-            }else if(validation.stringBuilderHasLetter(wrongLetters, guessLetter)){
+                wrongLetters.add(guessLetter);
+            } else if(wrongLetters.contains(guessLetter)){
                 printUtils.printLetterWasTried();
+                fileReading.readGallowState(gallowsLineToRead);
+                continue;
             }
 
             if (!hiddenWord.contains(guessLetter)) {
@@ -100,8 +106,8 @@ public class GameProcess {
             }
         }
         if (correctAnswersCount != wordFromFile.length()) {
-            fileReading.readGallowState(gallowsLineToRead);
             printUtils.printGameOver(wordFromFile);
+            start();
         }
     }
 
