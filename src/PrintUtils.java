@@ -67,7 +67,7 @@ public class PrintUtils {
         System.out.println();
         System.out.println("       VICTORY !       ");
         System.out.println();
-        System.out.println("Hidden word: " + word.toUpperCase());
+        System.out.println(" Hidden word: " + word.toUpperCase());
         System.out.println();
     }
 

@@ -36,18 +36,12 @@ public class GameProcess {
                 printUtils.printGoodBye();
                 break;
             }
-            if (answer >= TWO_DIGIT_NUMBER) {
-                printUtils.printNumberLengthError();
-            } else {
-                printUtils.printWrongNumberError();
-            }
         }
     }
 
     private void startRound(){
 
         Set<Character> wrongLetters = new LinkedHashSet<>();
-//        StringBuilder wrongLetters = new StringBuilder();
         printUtils.printLetsStart();
         printUtils.printDifficultyMenu();
 
@@ -58,14 +52,13 @@ public class GameProcess {
 
         String wordFromFile = fileReading.readAWord(fileReading.getPathForDifficulty(difficulty)).toUpperCase();
         ArrayList<Character> hiddenWord = textProcessor.fillListWithUnderscore(wordFromFile);
-        fileReading.readGallowState(gallowsLineToRead);
 
         while (mistakeCount < MAX_MISTAKES) {
             if (correctAnswersCount == wordFromFile.length()) {
                 printUtils.printVictory(wordFromFile);
-                break;
+                start();
             }
-
+            fileReading.readGallowState(gallowsLineToRead);
             printUtils.printHiddenWord(hiddenWord);
             printUtils.printWrongLetters(wrongLetters);
             printUtils.printMistakeCounter(mistakeCount);
@@ -73,18 +66,13 @@ public class GameProcess {
             String input = readingUtils.readInput();
             char guessLetter = input.charAt(0);
 
-            if(validation.isInCorrectAlphabet(guessLetter)){
-                printUtils.printWrongAlphabetUsed();
-                continue;
-            }
-
-            if (!validation.isValidLetter(guessLetter)) {
-                printUtils.printLetterTypeError();
-                continue;
-            }
-
             if (!validation.hasValidLength(input)) {
                 printUtils.printLetterLengthError();
+                continue;
+            }
+
+            if(validation.isInCorrectAlphabet(guessLetter)){
+                printUtils.printWrongAlphabetUsed();
                 continue;
             }
 
@@ -94,13 +82,11 @@ public class GameProcess {
                 wrongLetters.add(guessLetter);
             } else if(wrongLetters.contains(guessLetter)){
                 printUtils.printLetterWasTried();
-                fileReading.readGallowState(gallowsLineToRead);
                 continue;
             }
 
             if (!hiddenWord.contains(guessLetter)) {
                 correctAnswersCount = textProcessor.putLettersToListAndCount(wordFromFile, guessLetter, hiddenWord, correctAnswersCount);
-                fileReading.readGallowState(gallowsLineToRead);
             }else{
                 printUtils.printLetterWasGuessed();
             }
@@ -115,15 +101,30 @@ public class GameProcess {
 
     private int getAnswer() {
 
-        while (readingUtils.isPresent()){
-            readingUtils.next();
-            printUtils.printNumberTypeError();
-            printUtils.printStartOrExitMenu();
+        while (true){
+            if (readingUtils.isPresent()){
+                printUtils.printNumberTypeError();
+                printUtils.printStartOrExitMenu();
+                readingUtils.next();
+                continue;
+            }
+            int answer = readingUtils.readChoice();
+            if(answer >= TWO_DIGIT_NUMBER) {
+                printUtils.printNumberLengthError();
+                printUtils.printStartOrExitMenu();
+                continue;
+            }
+            if(answer == 1 || answer == 0 ){
+                return answer;
+            }else {
+                printUtils.printWrongNumberError();
+                printUtils.printStartOrExitMenu();
+            }
         }
-        return readingUtils.readChoice();
     }
 
     private int getUserChoice() {
+
         while(true){
             if (readingUtils.isPresent()){
                 printUtils.printNumberTypeError();
