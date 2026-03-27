@@ -1,21 +1,21 @@
-import java.util.Set;
-import java.util.ArrayList;
-import java.util.LinkedHashSet;
-
 public class GameProcess {
 
     private static final int QUIT = 0;
     private static final int PLAY = 1;
+    private static final int EASY = 1;
+    private static final int MEDIUM = 2;
+    private static final int HARD = 3;
     private static final int MAX_MISTAKES = 6;
-    private static final int GALLOW_SIZE_IN_FILE = 7;
     private static final int TWO_DIGIT_NUMBER = 10;
+    private final GameState gameState;
     private final PrintUtils printUtils;
     private final ReadingUtils readingUtils;
     private final FileReadingUtils fileReading;
     private final TextProcessor textProcessor;
     private final Validation validation;
 
-    public GameProcess(PrintUtils printUtils, ReadingUtils reading, FileReadingUtils fileReading, TextProcessor textProcessor, Validation validation){
+    public GameProcess(GameState gameState, PrintUtils printUtils, ReadingUtils reading, FileReadingUtils fileReading, TextProcessor textProcessor, Validation validation){
+        this.gameState = gameState;
         this.printUtils = printUtils;
         this.readingUtils = reading;
         this.fileReading = fileReading;
@@ -24,9 +24,10 @@ public class GameProcess {
     }
 
     public void start(){
+
+        gameState.resetGame();
         while(true) {
             printUtils.printStartOrExitMenu();
-
             int answer = getAnswer();
             if (answer == PLAY) {
                 startRound();
@@ -41,27 +42,23 @@ public class GameProcess {
 
     private void startRound(){
 
-        Set<Character> wrongLetters = new LinkedHashSet<>();
         printUtils.printLetsStart();
         printUtils.printDifficultyMenu();
 
         int difficulty = getUserChoice();
-        int mistakeCount = 0;
-        int correctAnswersCount = 0;
-        int gallowsLineToRead = 0;
+        gameState.initWord(difficulty);
+        gameState.createCharArray(gameState.getWordFromFile());
 
-        String wordFromFile = fileReading.readAWord(fileReading.getPathForDifficulty(difficulty)).toUpperCase();
-        ArrayList<Character> hiddenWord = textProcessor.fillListWithUnderscore(wordFromFile);
-
-        while (mistakeCount < MAX_MISTAKES) {
-            if (correctAnswersCount == wordFromFile.length()) {
-                printUtils.printVictory(wordFromFile);
+        while (gameState.getMistakeCount() < MAX_MISTAKES) {
+            if (gameState.getCorrectAnswersCount() == gameState.getWordFromFile().length()) {
+                printUtils.printVictory(gameState.getWordFromFile());
                 start();
+                return;
             }
-            fileReading.readGallowState(gallowsLineToRead);
-            printUtils.printHiddenWord(hiddenWord);
-            printUtils.printWrongLetters(wrongLetters);
-            printUtils.printMistakeCounter(mistakeCount);
+            fileReading.readGallowState(gameState.getGallowsLineToRead());
+            printUtils.printHiddenWord(gameState.getHiddenWord());
+            printUtils.printWrongLetters(gameState.getWrongLetters());
+            printUtils.printMistakeCounter(gameState.getMistakeCount());
 
             String input = readingUtils.readInput();
             char guessLetter = input.charAt(0);
@@ -76,28 +73,26 @@ public class GameProcess {
                 continue;
             }
 
-            if (!validation.isCorrectLetter(wordFromFile, guessLetter) && !wrongLetters.contains(guessLetter)) {
-                gallowsLineToRead += GALLOW_SIZE_IN_FILE;
-                mistakeCount++;
-                wrongLetters.add(guessLetter);
-            } else if(wrongLetters.contains(guessLetter)){
+            if (!gameState.getWordFromFile().contains(String.valueOf(guessLetter)) && !gameState.getWrongLetters().contains(guessLetter)) {
+                gameState.makeAMistake();
+                gameState.updateGallow();
+                gameState.getWrongLetters().add(guessLetter);
+            } else if(gameState.getWrongLetters().contains(guessLetter)){
                 printUtils.printLetterWasTried();
                 continue;
             }
 
-            if (!hiddenWord.contains(guessLetter)) {
-                correctAnswersCount = textProcessor.putLettersToListAndCount(wordFromFile, guessLetter, hiddenWord, correctAnswersCount);
+            if (!validation.contains(gameState.getHiddenWord(), guessLetter)) {
+                gameState.setCorrectAnswersCount(textProcessor.putLettersToListAndCount(gameState.getWordFromFile(), guessLetter, gameState.getHiddenWord(), gameState.getCorrectAnswersCount()));
             }else{
                 printUtils.printLetterWasGuessed();
             }
         }
-        if (correctAnswersCount != wordFromFile.length()) {
-            printUtils.printGameOver(wordFromFile);
+        if (gameState.getCorrectAnswersCount() != gameState.getWordFromFile().length()) {
+            printUtils.printGameOver(gameState.getWordFromFile());
             start();
         }
     }
-
-
 
     private int getAnswer() {
 
@@ -114,7 +109,7 @@ public class GameProcess {
                 printUtils.printStartOrExitMenu();
                 continue;
             }
-            if(answer == 1 || answer == 0 ){
+            if(answer == PLAY || answer == QUIT ){
                 return answer;
             }else {
                 printUtils.printWrongNumberError();
@@ -138,7 +133,7 @@ public class GameProcess {
                 printUtils.printDifficultyMenu();
                 continue;
             }
-            if(difficulty == 1 || difficulty == 2 || difficulty == 3){
+            if(difficulty == EASY || difficulty == MEDIUM || difficulty == HARD){
                 return difficulty;
             }else {
                 printUtils.printWrongNumberError();

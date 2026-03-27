@@ -1,10 +1,12 @@
 import java.io.IOException;
 import java.nio.file.Files;
 import java.nio.file.Paths;
+import java.util.List;
 import java.util.Random;
 
 public class FileReadingUtils {
-    Random random = new Random();
+
+    private final Random random = new Random();
 
     public String getPathForDifficulty(int levelOfDifficulty){
 
@@ -26,12 +28,19 @@ public class FileReadingUtils {
     }
 
     public String readAWord(String filePath){
-        int randomNumber = random.nextInt(20);
+
         try {
-            String word = Files.readAllLines(Paths.get(filePath)).get(randomNumber);
-            return word;
+            List<String> lines = Files.readAllLines(Paths.get(filePath));
+
+            if(lines.isEmpty()){
+                throw new RuntimeException("File is empty!");
+            }
+
+            int randomIndex = random.nextInt(lines.size());
+            return lines.get(randomIndex);
+
         } catch (IOException e) {
-            throw new RuntimeException(e);
+            throw new RuntimeException("Failed to read word from file: " + filePath, e);
         }
     }
 

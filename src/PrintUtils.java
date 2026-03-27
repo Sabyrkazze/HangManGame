@@ -1,4 +1,3 @@
-import java.util.ArrayList;
 import java.util.Set;
 
 public class PrintUtils {
@@ -25,7 +24,7 @@ public class PrintUtils {
         System.out.println("Good Bye!");
     }
 
-    public void printHiddenWord(ArrayList<Character> hiddenWord){
+    public void printHiddenWord(char[] hiddenWord){
         System.out.print("Hidden word: ");
         for (char letter : hiddenWord) {
             System.out.print(letter + " ") ;
@@ -96,12 +95,6 @@ public class PrintUtils {
         System.out.println("LONG INPUT. LENGTH MUST BE 1!");
         System.out.println();
 
-    }
-
-    public void printLetterTypeError(){
-        System.out.println();
-        System.out.println("PLEASE, ENTER A LETTER.");
-        System.out.println();
     }
 
     public void printLetterLengthError(){

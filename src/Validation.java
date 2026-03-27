@@ -8,7 +8,12 @@ public class Validation {
         return input.length() == 1;
     }
 
-    public boolean isCorrectLetter(String word, char guessingLetter) {
-        return word.contains(String.valueOf(guessingLetter));
+    public boolean contains(char[] hiddenWord, char guessLetter){
+        for (char letter : hiddenWord){
+            if (letter == guessLetter){
+                return true;
+            }
+        }
+        return false;
     }
 }
