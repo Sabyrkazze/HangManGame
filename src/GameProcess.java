@@ -19,13 +19,13 @@ public class GameProcess {
 
     public void start() {
 
-        gameState.resetGame();
         while (true) {
             PrintUtils.printStartOrExitMenu();
             int answer = getAnswer();
+
             if (answer == PLAY) {
+                gameState.resetGame();
                 startRound();
-                break;
             }
             if (answer == QUIT) {
                 PrintUtils.printGoodBye();
@@ -46,7 +46,6 @@ public class GameProcess {
         while (gameState.getMistakeCount() < MAX_MISTAKES) {
             if (gameState.getCorrectAnswersCount() == gameState.getWordFromFile().length()) {
                 PrintUtils.printVictory(gameState.getWordFromFile());
-                start();
                 return;
             }
             PrintUtils.printGallowsStage(gameState.getMistakeCount());
@@ -84,7 +83,6 @@ public class GameProcess {
         }
         if (gameState.getCorrectAnswersCount() != gameState.getWordFromFile().length()) {
             PrintUtils.printGameOver(gameState.getWordFromFile());
-            start();
         }
     }
 
