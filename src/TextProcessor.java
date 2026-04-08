@@ -1,14 +1,20 @@
 public class TextProcessor {
 
-
-
-    public int putLettersToListAndCount(String word, char guessingLetter, char[] hiddenWord, int winCount) {
-        for (int i = 0; i < word.length(); i++) {
-            if (word.charAt(i) == guessingLetter){
+    public void putLettersToList(String wordFromFile, char guessingLetter, char[] hiddenWord) {
+        for (int i = 0; i < wordFromFile.length(); i++) {
+            if (wordFromFile.charAt(i) == guessingLetter) {
                 hiddenWord[i] = guessingLetter;
-                winCount++;
             }
         }
-        return winCount;
+    }
+
+    public int countOccurrences(char[] hiddenWord, char guessLetter) {
+        int count = 0;
+        for (char letter : hiddenWord) {
+            if (letter == guessLetter) {
+                count++;
+            }
+        }
+        return count;
     }
 }

@@ -1,27 +1,29 @@
 import java.util.Scanner;
 
 public class ReadingUtils {
-    private final Scanner scanner;
-    private final PrintUtils printUtils = new PrintUtils();
+    private static Scanner scanner;
 
-    public ReadingUtils(Scanner scanner){
-        this.scanner = scanner;
+    private ReadingUtils() {
     }
 
-    public void next(){
+    public static void init(Scanner scanner) {
+        ReadingUtils.scanner = scanner;
+    }
+
+    public static void next() {
         scanner.next();
     }
 
-    public String readInput() {
+    public static String readInput() {
         System.out.println("Type the letter: ");
         return scanner.next().toUpperCase();
     }
 
-    public boolean isPresent(){
+    public static boolean isPresent() {
         return !scanner.hasNextInt();
     }
 
-    public int readChoice(){
+    public static int readChoice() {
         int difficulty = scanner.nextInt();
         scanner.nextLine();
         return difficulty;

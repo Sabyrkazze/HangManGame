@@ -1,4 +1,8 @@
-public class GameProcess {
+public record GameProcess(
+        GameState gameState,
+        TextProcessor textProcessor,
+        InputValidator inputValidator,
+        GameValidator gameValidator) {
 
     private static final int QUIT = 0;
     private static final int PLAY = 1;
@@ -7,137 +11,122 @@ public class GameProcess {
     private static final int HARD = 3;
     private static final int MAX_MISTAKES = 6;
     private static final int TWO_DIGIT_NUMBER = 10;
-    private final GameState gameState;
-    private final PrintUtils printUtils;
-    private final ReadingUtils readingUtils;
-    private final FileReadingUtils fileReading;
-    private final TextProcessor textProcessor;
-    private final Validation validation;
 
-    public GameProcess(GameState gameState, PrintUtils printUtils, ReadingUtils reading, FileReadingUtils fileReading, TextProcessor textProcessor, Validation validation){
-        this.gameState = gameState;
-        this.printUtils = printUtils;
-        this.readingUtils = reading;
-        this.fileReading = fileReading;
-        this.textProcessor = textProcessor;
-        this.validation = validation;
-    }
-
-    public void start(){
+    public void start() {
 
         gameState.resetGame();
-        while(true) {
-            printUtils.printStartOrExitMenu();
+        while (true) {
+            PrintUtils.printStartOrExitMenu();
             int answer = getAnswer();
             if (answer == PLAY) {
                 startRound();
                 break;
             }
             if (answer == QUIT) {
-                printUtils.printGoodBye();
+                PrintUtils.printGoodBye();
                 break;
             }
         }
     }
 
-    private void startRound(){
+    private void startRound() {
 
-        printUtils.printLetsStart();
-        printUtils.printDifficultyMenu();
+        PrintUtils.printLetsStart();
+        PrintUtils.printDifficultyMenu();
 
-        int difficulty = getUserChoice();
-        gameState.initWord(difficulty);
+        gameState.setDifficulty(getUserChoice());
+        gameState.initWord(gameState.getDifficulty());
         gameState.createCharArray(gameState.getWordFromFile());
 
         while (gameState.getMistakeCount() < MAX_MISTAKES) {
             if (gameState.getCorrectAnswersCount() == gameState.getWordFromFile().length()) {
-                printUtils.printVictory(gameState.getWordFromFile());
+                PrintUtils.printVictory(gameState.getWordFromFile());
                 start();
                 return;
             }
-            fileReading.readGallowState(gameState.getGallowsLineToRead());
-            printUtils.printHiddenWord(gameState.getHiddenWord());
-            printUtils.printWrongLetters(gameState.getWrongLetters());
-            printUtils.printMistakeCounter(gameState.getMistakeCount());
+            PrintUtils.printGallowsStage(gameState.getMistakeCount());
+            PrintUtils.printHiddenWord(gameState.getHiddenWord());
+            PrintUtils.printWrongLetters(gameState.getWrongLetters());
+            PrintUtils.printMistakeCounter(gameState.getMistakeCount());
 
-            String input = readingUtils.readInput();
+            String input = ReadingUtils.readInput();
             char guessLetter = input.charAt(0);
 
-            if (!validation.hasValidLength(input)) {
-                printUtils.printLetterLengthError();
+            if (!inputValidator.hasValidLength(input)) {
+                PrintUtils.printLetterLengthError();
                 continue;
             }
 
-            if(validation.isInCorrectAlphabet(guessLetter)){
-                printUtils.printWrongAlphabetUsed();
+            if (inputValidator.isInCorrectAlphabet(guessLetter)) {
+                PrintUtils.printWrongAlphabetUsed();
                 continue;
             }
 
             if (!gameState.getWordFromFile().contains(String.valueOf(guessLetter)) && !gameState.getWrongLetters().contains(guessLetter)) {
                 gameState.makeAMistake();
-                gameState.updateGallow();
                 gameState.getWrongLetters().add(guessLetter);
-            } else if(gameState.getWrongLetters().contains(guessLetter)){
-                printUtils.printLetterWasTried();
+            } else if (gameState.getWrongLetters().contains(guessLetter)) {
+                PrintUtils.printLetterWasTried();
                 continue;
             }
 
-            if (!validation.contains(gameState.getHiddenWord(), guessLetter)) {
-                gameState.setCorrectAnswersCount(textProcessor.putLettersToListAndCount(gameState.getWordFromFile(), guessLetter, gameState.getHiddenWord(), gameState.getCorrectAnswersCount()));
-            }else{
-                printUtils.printLetterWasGuessed();
+            if (!gameValidator.contains(gameState.getHiddenWord(), guessLetter)) {
+                textProcessor.putLettersToList(gameState.getWordFromFile(), guessLetter, gameState.getHiddenWord());
+                gameState.addToCorrectAnswersCount(textProcessor.countOccurrences(gameState.getHiddenWord(), guessLetter));
+            } else {
+                PrintUtils.printLetterWasGuessed();
             }
         }
         if (gameState.getCorrectAnswersCount() != gameState.getWordFromFile().length()) {
-            printUtils.printGameOver(gameState.getWordFromFile());
+            PrintUtils.printGameOver(gameState.getWordFromFile());
             start();
         }
     }
 
     private int getAnswer() {
 
-        while (true){
-            if (readingUtils.isPresent()){
-                printUtils.printNumberTypeError();
-                printUtils.printStartOrExitMenu();
-                readingUtils.next();
+        while (true) {
+            if (ReadingUtils.isPresent()) {
+                PrintUtils.printNumberTypeError();
+                PrintUtils.printStartOrExitMenu();
+                ReadingUtils.next();
                 continue;
             }
-            int answer = readingUtils.readChoice();
-            if(answer >= TWO_DIGIT_NUMBER) {
-                printUtils.printNumberLengthError();
-                printUtils.printStartOrExitMenu();
+            int answer = ReadingUtils.readChoice();
+            if (answer >= TWO_DIGIT_NUMBER) {
+                PrintUtils.printNumberLengthError();
+                PrintUtils.printStartOrExitMenu();
                 continue;
             }
-            if(answer == PLAY || answer == QUIT ){
+            if (answer == PLAY || answer == QUIT) {
                 return answer;
-            }else {
-                printUtils.printWrongNumberError();
-                printUtils.printStartOrExitMenu();
+            } else {
+                PrintUtils.printWrongNumberError();
+                PrintUtils.printStartOrExitMenu();
             }
         }
     }
 
     private int getUserChoice() {
 
-        while(true){
-            if (readingUtils.isPresent()){
-                printUtils.printNumberTypeError();
-                printUtils.printDifficultyMenu();
-                readingUtils.next();
+        while (true) {
+            if (ReadingUtils.isPresent()) {
+                PrintUtils.printNumberTypeError();
+                PrintUtils.printDifficultyMenu();
+                ReadingUtils.next();
                 continue;
             }
-            int difficulty = readingUtils.readChoice();
-            if(difficulty >= TWO_DIGIT_NUMBER) {
-                printUtils.printNumberLengthError();
-                printUtils.printDifficultyMenu();
+            int difficulty = ReadingUtils.readChoice();
+            if (difficulty >= TWO_DIGIT_NUMBER) {
+                PrintUtils.printNumberLengthError();
+                PrintUtils.printDifficultyMenu();
                 continue;
             }
-            if(difficulty == EASY || difficulty == MEDIUM || difficulty == HARD){
+            if (difficulty == EASY || difficulty == MEDIUM || difficulty == HARD) {
                 return difficulty;
-            }else {
-                printUtils.printWrongNumberError();
-                printUtils.printDifficultyMenu();
+            } else {
+                PrintUtils.printWrongNumberError();
+                PrintUtils.printDifficultyMenu();
             }
         }
     }
