@@ -9,7 +9,6 @@ public class Main {
             ReadingUtils.init(scanner);
             GameProcess game = new GameProcess(
                     new GameState(new LinkedHashSet<>()),
-                    new TextProcessor(),
                     new InputValidator(),
                     new GameValidator()
             );

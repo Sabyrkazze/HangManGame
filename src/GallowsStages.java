@@ -1,5 +1,3 @@
-import javax.swing.*;
-
 public enum GallowsStages {
     FIRST_STAGE("""  
               +---+

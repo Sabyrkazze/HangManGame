@@ -1,8 +1,4 @@
-public record GameProcess(
-        GameState gameState,
-        TextProcessor textProcessor,
-        InputValidator inputValidator,
-        GameValidator gameValidator) {
+public class GameProcess {
 
     private static final int QUIT = 0;
     private static final int PLAY = 1;
@@ -11,6 +7,15 @@ public record GameProcess(
     private static final int HARD = 3;
     private static final int MAX_MISTAKES = 6;
     private static final int TWO_DIGIT_NUMBER = 10;
+    private final GameState gameState;
+    private final InputValidator inputValidator;
+    private final GameValidator gameValidator;
+
+    public GameProcess(GameState gameState, InputValidator inputValidator, GameValidator gameValidator) {
+        this.gameState = gameState;
+        this.inputValidator = inputValidator;
+        this.gameValidator = gameValidator;
+    }
 
     public void start() {
 
@@ -71,8 +76,8 @@ public record GameProcess(
             }
 
             if (!gameValidator.contains(gameState.getHiddenWord(), guessLetter)) {
-                textProcessor.putLettersToList(gameState.getWordFromFile(), guessLetter, gameState.getHiddenWord());
-                gameState.addToCorrectAnswersCount(textProcessor.countOccurrences(gameState.getHiddenWord(), guessLetter));
+                TextProcessor.putLettersToList(gameState.getWordFromFile(), guessLetter, gameState.getHiddenWord());
+                gameState.addToCorrectAnswersCount(TextProcessor.countOccurrences(gameState.getHiddenWord(), guessLetter));
             } else {
                 PrintUtils.printLetterWasGuessed();
             }
